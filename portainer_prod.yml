@@ -1,0 +1,27 @@
+version: '3.2'
+
+services:
+
+  markster-web-prod:
+    image: apwells/bottle-tracker-prod
+    deploy:
+      mode: replicated
+      replicas: 3
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_public"
+        - "traefik.http.routers.markster-web-prod.rule=Host(`bt.alandstreetlab.uk`)"
+        - "traefik.http.routers.markster-web-prod.entrypoints=https"
+        - "traefik.http.services.markster-web-prod.loadbalancer.server.port=80"
+        - "traefik.http.routers.markster-web-prod.tls.certresolver=lets-encrypt"
+        - "traefik.http.routers.markster-web-prod.tls=true"
+        - "traefik.http.routers.markster-web-prod.tls.domains[0].main=bt.alandstreetlab.uk"
+        - "traefik.http.routers.markster-web-prod.tls.domains[0].sans=*.alandstreetlab.uk"
+    networks:
+      - traefik_public
+
+networks:
+  traefik_public:
+    external: true
